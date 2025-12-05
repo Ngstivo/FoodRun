@@ -1,69 +1,94 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 
 type UserType = 'customer' | 'restaurant' | 'driver';
 
-export default function SignupPage() {
+function SignupForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const userType = (searchParams.get('type') as UserType) || 'customer';
+    const userType = (searchParams.get('type') as UserType) || 'restaurant';
 
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [fullName, setFullName] = useState('');
-    const [phone, setPhone] = useState('');
+    const [formData, setFormData] = useState({
+        email: '',
+        password: '',
+        confirmPassword: '',
+        fullName: '',
+        phone: '',
+    });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
     const getUserTypeLabel = (type: UserType) => {
         switch (type) {
             case 'customer':
-                return 'Klient';
+                return 'Klienta';
             case 'restaurant':
-                return 'Partner Restauracyjny';
+                return 'Restauracji';
             case 'driver':
-                return 'Partner Kierowca';
+                return 'Kierowcy';
         }
     };
 
-    const handleSignup = async (e: React.FormEvent) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value,
+        });
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setError('');
 
+        if (formData.password !== formData.confirmPassword) {
+            setError('Hasła nie są identyczne');
+            setLoading(false);
+            return;
+        }
+
         try {
-            // Create auth user
-            const { data: authData, error: signUpError } = await supabase.auth.signUp({
-                email,
-                password,
+            // Create user account
+            const { data, error: signUpError } = await supabase.auth.signUp({
+                email: formData.email,
+                password: formData.password,
+                options: {
+                    data: {
+                        full_name: formData.fullName,
+                        phone: formData.phone,
+                        user_type: userType,
+                    },
+                },
             });
 
             if (signUpError) throw signUpError;
-            if (!authData.user) throw new Error('Failed to create user');
+            if (!data.user) throw new Error('Błąd podczas tworzenia konta');
 
             // Create profile
-            const { error: profileError } = await supabase
-                .from('profiles')
-                .insert({
-                    id: authData.user.id,
-                    user_type: userType,
-                    full_name: fullName,
-                    phone,
-                });
+            const { error: profileError } = await supabase.from('profiles').insert({
+                id: data.user.id,
+                user_type: userType,
+                full_name: formData.fullName,
+                phone: formData.phone,
+            });
 
             if (profileError) throw profileError;
 
-            // Redirect to onboarding if restaurant or driver, otherwise to dashboard
-            if (userType === 'restaurant') {
-                router.push('/auth/onboarding/restaurant');
-            } else if (userType === 'driver') {
-                router.push('/auth/onboarding/driver');
-            } else {
-                router.push('/customer/restaurants');
+            // Redirect to onboarding based on user type
+            switch (userType) {
+                case 'customer':
+                    router.push('/customer/restaurants');
+                    break;
+                case 'restaurant':
+                    router.push('/auth/onboarding/restaurant');
+                    break;
+                case 'driver':
+                    router.push('/auth/onboarding/driver');
+                    break;
             }
         } catch (err: any) {
             setError(err.message || 'Błąd rejestracji');
@@ -80,7 +105,7 @@ export default function SignupPage() {
                         Rejestracja
                     </h1>
                     <p className="text-gray-600">
-                        {getUserTypeLabel(userType)}
+                        Rejestracja {getUserTypeLabel(userType)}
                     </p>
                 </div>
 
@@ -90,15 +115,16 @@ export default function SignupPage() {
                     </div>
                 )}
 
-                <form onSubmit={handleSignup} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Imię i nazwisko
+                            Imię i nazwisko *
                         </label>
                         <input
                             type="text"
-                            value={fullName}
-                            onChange={(e) => setFullName(e.target.value)}
+                            name="fullName"
+                            value={formData.fullName}
+                            onChange={handleChange}
                             className="input"
                             placeholder="Jan Kowalski"
                             required
@@ -107,26 +133,13 @@ export default function SignupPage() {
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Telefon
-                        </label>
-                        <input
-                            type="tel"
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
-                            className="input"
-                            placeholder="+48 123 456 789"
-                            required
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Email
+                            Email *
                         </label>
                         <input
                             type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
                             className="input"
                             placeholder="twoj@email.pl"
                             required
@@ -135,18 +148,50 @@ export default function SignupPage() {
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Hasło
+                            Telefon *
+                        </label>
+                        <input
+                            type="tel"
+                            name="phone"
+                            value={formData.phone}
+                            onChange={handleChange}
+                            className="input"
+                            placeholder="+48 123 456 789"
+                            required
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Hasło *
                         </label>
                         <input
                             type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            name="password"
+                            value={formData.password}
+                            onChange={handleChange}
                             className="input"
                             placeholder="••••••••"
                             minLength={6}
                             required
                         />
                         <p className="text-xs text-gray-500 mt-1">Minimum 6 znaków</p>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Potwierdź hasło *
+                        </label>
+                        <input
+                            type="password"
+                            name="confirmPassword"
+                            value={formData.confirmPassword}
+                            onChange={handleChange}
+                            className="input"
+                            placeholder="••••••••"
+                            minLength={6}
+                            required
+                        />
                     </div>
 
                     <button
@@ -177,5 +222,17 @@ export default function SignupPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function SignupPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center">
+                <div className="text-xl">Ładowanie...</div>
+            </div>
+        }>
+            <SignupForm />
+        </Suspense>
     );
 }

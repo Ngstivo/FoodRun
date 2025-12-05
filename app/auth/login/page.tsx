@@ -1,16 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 
-type UserType = 'customer' | 'restaurant' | 'driver';
+type UserType = 'customer' | 'restaurant' | 'driver' | 'admin';
 
-export default function LoginPage() {
+function LoginForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const userType = (searchParams.get('type') as UserType) || 'customer';
+    const userType = (searchParams.get('type') as UserType) || 'restaurant';
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -25,6 +25,8 @@ export default function LoginPage() {
                 return 'Restauracja';
             case 'driver':
                 return 'Kierowca';
+            case 'admin':
+                return 'Administrator';
         }
     };
 
@@ -63,6 +65,9 @@ export default function LoginPage() {
                     break;
                 case 'driver':
                     router.push('/driver/dashboard');
+                    break;
+                case 'admin':
+                    router.push('/admin/dashboard');
                     break;
             }
         } catch (err: any) {
@@ -147,5 +152,17 @@ export default function LoginPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center">
+                <div className="text-xl">Ładowanie...</div>
+            </div>
+        }>
+            <LoginForm />
+        </Suspense>
     );
 }
