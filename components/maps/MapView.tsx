@@ -106,5 +106,5 @@ function getMarkerIcon(type?: 'pickup' | 'delivery' | 'driver'): L.Icon {
         });
     }
 
-    return new L.Icon.Default();
+    return new L.Icon.Default() as L.Icon;
 }

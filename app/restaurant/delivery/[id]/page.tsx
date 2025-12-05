@@ -200,18 +200,22 @@ export default function DeliveryTrackingPage() {
         );
     }
 
-    const mapMarkers = [
-        {
-            position: [delivery.pickup_lat!, delivery.pickup_lng!] as [number, number],
-            label: `Odbiór: ${delivery.pickup_address}`,
-            type: 'pickup' as const,
-        },
-        {
-            position: [delivery.delivery_lat!, delivery.delivery_lng!] as [number, number],
-            label: `Dostawa: ${delivery.delivery_address}`,
-            type: 'delivery' as const,
-        },
-    ];
+    const mapMarkers: Array<{
+        position: [number, number];
+        label: string;
+        type: 'pickup' | 'delivery' | 'driver';
+    }> = [
+            {
+                position: [delivery.pickup_lat!, delivery.pickup_lng!] as [number, number],
+                label: `Odbiór: ${delivery.pickup_address}`,
+                type: 'pickup' as const,
+            },
+            {
+                position: [delivery.delivery_lat!, delivery.delivery_lng!] as [number, number],
+                label: `Dostawa: ${delivery.delivery_address}`,
+                type: 'delivery' as const,
+            },
+        ];
 
     // Add driver marker if driver is assigned and has location
     if (driver && driver.current_lat && driver.current_lng) {
