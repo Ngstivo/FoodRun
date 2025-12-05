@@ -53,12 +53,13 @@ export default function VerifyDriversPage() {
                 .from('profiles')
                 .select('user_type')
                 .eq('id', user.id)
-                .single();
+                .single<{ user_type: string }>();
 
             if (profileError || !profile || profile.user_type !== 'admin') {
                 router.push('/');
                 return;
             }
+
 
             await fetchDrivers();
         } catch (error) {

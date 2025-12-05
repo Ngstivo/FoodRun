@@ -48,7 +48,7 @@ export default function DriverOnboarding() {
         });
     };
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'id Card' | 'driversLicense') => {
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'idCard' | 'driversLicense') => {
         if (e.target.files && e.target.files[0]) {
             setDocuments({
                 ...documents,

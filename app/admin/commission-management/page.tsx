@@ -33,16 +33,18 @@ export default function CommissionManagementPage() {
                 return;
             }
 
+
             const { data: profile, error: profileError } = await supabase
                 .from('profiles')
                 .select('user_type')
                 .eq('id', user.id)
-                .single();
+                .single<{ user_type: string }>();
 
             if (profileError || !profile || profile.user_type !== 'admin') {
                 router.push('/');
                 return;
             }
+
 
             await fetchRestaurants();
         } catch (error) {
@@ -66,6 +68,7 @@ export default function CommissionManagementPage() {
         setUpdating(restaurant.id);
         try {
             const newStatus = !restaurant.is_high_volume;
+            // @ts-ignore - Supabase types not generated yet
             const { error } = await supabase
                 .from('restaurants')
                 .update({ is_high_volume: newStatus })
