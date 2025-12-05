@@ -33,13 +33,13 @@ export default function CommissionManagementPage() {
                 return;
             }
 
-            const { data: profile } = await supabase
+            const { data: profile, error: profileError } = await supabase
                 .from('profiles')
                 .select('user_type')
                 .eq('id', user.id)
                 .single();
 
-            if (profile?.user_type !== 'admin') {
+            if (profileError || !profile || profile.user_type !== 'admin') {
                 router.push('/');
                 return;
             }
@@ -184,8 +184,8 @@ export default function CommissionManagementPage() {
                                             onClick={() => toggleHighVolume(restaurant)}
                                             disabled={updating === restaurant.id}
                                             className={`btn ${restaurant.is_high_volume
-                                                    ? 'bg-gray-500 hover:bg-gray-600 text-white'
-                                                    : 'btn-primary'
+                                                ? 'bg-gray-500 hover:bg-gray-600 text-white'
+                                                : 'btn-primary'
                                                 }`}
                                         >
                                             {updating === restaurant.id

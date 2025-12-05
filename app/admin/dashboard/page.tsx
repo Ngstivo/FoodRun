@@ -28,13 +28,13 @@ export default function AdminDashboard() {
             }
 
             // Check if user is admin
-            const { data: profile } = await supabase
+            const { data: profile, error: profileError } = await supabase
                 .from('profiles')
                 .select('user_type')
                 .eq('id', user.id)
                 .single();
 
-            if (profile?.user_type !== 'admin') {
+            if (profileError || !profile || profile.user_type !== 'admin') {
                 router.push('/');
                 return;
             }
@@ -46,7 +46,7 @@ export default function AdminDashboard() {
                 supabase.from('delivery_requests').select('*').eq('status', 'delivered'),
             ]);
 
-            const revenue = deliveries.data?.reduce((sum, d) => sum + d.platform_commission, 0) || 0;
+            const revenue = deliveries.data?.reduce((sum: number, d: any) => sum + d.platform_commission, 0) || 0;
 
             setStats({
                 pendingRestaurants: restaurants.data?.length || 0,

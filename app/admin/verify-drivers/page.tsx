@@ -49,13 +49,13 @@ export default function VerifyDriversPage() {
                 return;
             }
 
-            const { data: profile } = await supabase
+            const { data: profile, error: profileError } = await supabase
                 .from('profiles')
                 .select('user_type')
                 .eq('id', user.id)
                 .single();
 
-            if (profile?.user_type !== 'admin') {
+            if (profileError || !profile || profile.user_type !== 'admin') {
                 router.push('/');
                 return;
             }
