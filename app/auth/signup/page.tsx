@@ -68,15 +68,7 @@ function SignupForm() {
             if (signUpError) throw signUpError;
             if (!data.user) throw new Error('Błąd podczas tworzenia konta');
 
-            // Create profile
-            const { error: profileError } = await supabase.from('profiles').insert({
-                id: data.user.id,
-                user_type: userType,
-                full_name: formData.fullName,
-                phone: formData.phone,
-            });
-
-            if (profileError) throw profileError;
+            // Profile is created automatically by database trigger
 
             // Redirect to onboarding based on user type
             switch (userType) {
