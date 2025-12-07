@@ -34,7 +34,9 @@ export default function HomePage() {
                         <p>✅ <strong>FoodRun:</strong> Zamawiasz dostępnego kierowcę przez naszą platformę</p>
                         <p>✅ <strong>Kierowca:</strong> Odbiera zamówienie i dostarcza do klienta</p>
                         <p className="pt-2 border-t border-blue-300">
-                            <strong>Koszt:</strong> 16 PLN (do 3km) + 1 PLN/km + prowizja 4 PLN (lub 3 PLN dla dużych restauracji)
+                            <strong>Cennik:</strong> 16 PLN + 1 PLN/km (opłata kierowcy) + prowizja 2 PLN dla restauracji + 2 PLN dla kierowcy
+                            <br />
+                            <small className="text-blue-700">Rabat wysokoobrotowy: 1.5 PLN prowizji od 100 dostaw/m-c (dla każdego partnera osobno)</small>
                         </p>
                     </div>
                 </div>
@@ -48,7 +50,9 @@ export default function HomePage() {
                             Dla Restauracji
                         </h3>
                         <p className="text-gray-600 mb-6">
-                            Zamawiaj kierowców do swoich dostaw. Śledź dostawy w czasie rzeczywistym. Płać tylko za ukończone dostawy.
+                            Zamawiaj kierowców do swoich dostaw. Śledź dostawy w czasie rzeczywistym.
+                            <br />
+                            <small className="text-gray-500">Koszt: opłata kierowcy + 2 PLN prowizji (1.5 PLN od 100 dostaw/m-c)</small>
                         </p>
                         <div className="space-y-3">
                             <Link
@@ -73,7 +77,9 @@ export default function HomePage() {
                             Dla Kierowców
                         </h3>
                         <p className="text-gray-600 mb-6">
-                            Przyjmuj zlecenia dostaw od restauracji. Zarabiaj 16 PLN + dystans za każdą dostawę. Otrzymuj wypłaty automatycznie.
+                            Przyjmuj zlecenia dostaw od restauracji. Zarabiaj 16 PLN + dystans za każdą dostawę*.
+                            <br />
+                            <small className="text-gray-500">*Prowizja: 2 PLN (1.5 PLN od 100 dostaw/m-c)</small>
                         </p>
                         <div className="space-y-3">
                             <Link

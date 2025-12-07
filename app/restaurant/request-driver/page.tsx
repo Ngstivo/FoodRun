@@ -35,7 +35,9 @@ export default function RequestDriverPage() {
     const [costEstimate, setCostEstimate] = useState<{
         distance: number;
         deliveryFee: number;
-        commission: number;
+        restaurantCommission: number;
+        driverCommission: number;
+        platformCommission: number;
         totalCost: number;
     } | null>(null);
 
@@ -114,21 +116,23 @@ export default function RequestDriverPage() {
 
             const distanceData = await distanceRes.json();
 
-            // Call database function to calculate costs
             const { data, error } = await supabase
                 .rpc('calculate_delivery_cost', {
                     rest_id: restaurant.id,
+                    driver_id_param: null, // No driver assigned yet
                     distance: distanceData.distanceKm,
                 });
 
             if (error) throw error;
 
-            if (data && data.length > 0) {
+            if (data) {
                 setCostEstimate({
                     distance: distanceData.distanceKm,
-                    deliveryFee: data[0].delivery_fee,
-                    commission: data[0].commission,
-                    totalCost: data[0].total_cost,
+                    deliveryFee: data.delivery_fee,
+                    restaurantCommission: data.restaurant_commission,
+                    driverCommission: data.driver_commission,
+                    platformCommission: data.platform_commission,
+                    totalCost: data.total_cost,
                 });
             }
         } catch (err: any) {
@@ -168,7 +172,9 @@ export default function RequestDriverPage() {
                     customer_phone: formData.customerPhone || null,
                     special_instructions: formData.specialInstructions || null,
                     delivery_fee: costEstimate.deliveryFee,
-                    platform_commission: costEstimate.commission,
+                    restaurant_commission: costEstimate.restaurantCommission,
+                    driver_commission: costEstimate.driverCommission,
+                    platform_commission: costEstimate.platformCommission,
                     total_cost: costEstimate.totalCost,
                     status: 'pending',
                 })
@@ -277,8 +283,12 @@ export default function RequestDriverPage() {
                                             <span className="font-medium">{costEstimate.deliveryFee.toFixed(2)} PLN</span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span className="text-gray-700">Prowizja platformy:</span>
-                                            <span className="font-medium">{costEstimate.commission.toFixed(2)} PLN</span>
+                                            <span className="text-gray-700">Twoja prowizja:</span>
+                                            <span className="font-medium">{costEstimate.restaurantCommission.toFixed(2)} PLN</span>
+                                        </div>
+                                        <div className="flex justify-between text-xs text-gray-500">
+                                            <span>Prowizja kierowcy:</span>
+                                            <span>{costEstimate.driverCommission.toFixed(2)} PLN</span>
                                         </div>
                                         <div className="flex justify-between pt-2 border-t border-green-300">
                                             <span className="font-bold text-green-900">Całkowity koszt:</span>

@@ -24,6 +24,8 @@ type DeliveryRequest = {
     customer_phone: string | null;
     special_instructions: string | null;
     delivery_fee: number;
+    restaurant_commission: number;
+    driver_commission: number;
     platform_commission: number;
     total_cost: number;
     status: string;
@@ -307,8 +309,12 @@ export default function DeliveryTrackingPage() {
                                     <span className="font-medium">{delivery.delivery_fee.toFixed(2)} PLN</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span>Prowizja:</span>
-                                    <span className="font-medium">{delivery.platform_commission.toFixed(2)} PLN</span>
+                                    <span>Twoja prowizja:</span>
+                                    <span className="font-medium">{delivery.restaurant_commission.toFixed(2)} PLN</span>
+                                </div>
+                                <div className="flex justify-between text-xs text-gray-500">
+                                    <span>Prowizja kierowcy:</span>
+                                    <span>{delivery.driver_commission.toFixed(2)} PLN</span>
                                 </div>
                                 <div className="flex justify-between pt-2 border-t font-bold">
                                     <span>Razem:</span>

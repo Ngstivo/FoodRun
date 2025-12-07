@@ -33,6 +33,8 @@ export interface Database {
                     customer_phone: string | null;
                     special_instructions: string | null;
                     delivery_fee: number;
+                    restaurant_commission: number;
+                    driver_commission: number;
                     platform_commission: number;
                     total_cost: number;
                     status: DeliveryRequestStatus;
@@ -62,6 +64,8 @@ export interface Database {
                     customer_phone?: string | null;
                     special_instructions?: string | null;
                     delivery_fee: number;
+                    restaurant_commission: number;
+                    driver_commission: number;
                     platform_commission: number;
                     total_cost: number;
                     status?: DeliveryRequestStatus;
@@ -107,12 +111,15 @@ export interface Database {
                 Returns: number;
             };
             calculate_delivery_cost: {
-                Args: { rest_id: string; distance: number };
-                Returns: Array<{
+                Args: { rest_id: string; driver_id_param: string | null; distance: number };
+                Returns: {
                     delivery_fee: number;
-                    commission: number;
+                    restaurant_commission: number;
+                    driver_commission: number;
+                    platform_commission: number;
                     total_cost: number;
-                }>;
+                    driver_net_earnings: number;
+                };
             };
         };
     };

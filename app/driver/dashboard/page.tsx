@@ -11,6 +11,7 @@ type DeliveryRequest = {
     delivery_address: string;
     distance_km: number | null;
     delivery_fee: number;
+    driver_commission: number;
     total_cost: number;
     status: string;
     created_at: string;
@@ -201,8 +202,8 @@ export default function DriverDashboard() {
                             <button
                                 onClick={toggleAvailability}
                                 className={`px-3 py-1 rounded-full text-sm font-medium ${isAvailable
-                                        ? 'bg-green-500 text-white'
-                                        : 'bg-gray-300 text-gray-700'
+                                    ? 'bg-green-500 text-white'
+                                    : 'bg-gray-300 text-gray-700'
                                     }`}
                             >
                                 {isAvailable ? '● Dostępny' : '○ Niedostępny'}
@@ -244,10 +245,23 @@ export default function DriverDashboard() {
                                 <span className="ml-2 font-medium">{activeDelivery.distance_km} km</span>
                             </div>
                             <div>
-                                <span className="text-sm text-gray-600">Zarobek:</span>
-                                <span className="ml-2 font-bold text-green-600 text-lg">
-                                    {activeDelivery.delivery_fee.toFixed(2)} PLN
-                                </span>
+                                <span className="text-sm text-gray-600">Twoje zarobki:</span>
+                                <div className="mt-1 space-y-1">
+                                    <div className="flex justify-between text-sm">
+                                        <span>Opłata bazowa + dystans:</span>
+                                        <span className="font-medium">{activeDelivery.delivery_fee.toFixed(2)} PLN</span>
+                                    </div>
+                                    <div className="flex justify-between text-sm text-red-600">
+                                        <span>Prowizja platformy:</span>
+                                        <span>-{activeDelivery.driver_commission.toFixed(2)} PLN</span>
+                                    </div>
+                                    <div className="flex justify-between pt-1 border-t border-blue-200">
+                                        <span className="font-bold">Zarobek netto:</span>
+                                        <span className="font-bold text-green-600 text-lg">
+                                            {(activeDelivery.delivery_fee - activeDelivery.driver_commission).toFixed(2)} PLN
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
 
                             {/* Action Buttons */}
@@ -309,8 +323,11 @@ export default function DriverDashboard() {
                                         </div>
                                         <div className="text-right ml-4">
                                             <p className="text-sm text-gray-600">Zarobek</p>
-                                            <p className="text-xl font-bold text-green-600">
-                                                {request.delivery_fee.toFixed(2)} PLN
+                                            <p className="text-lg font-bold text-green-600">
+                                                {(request.delivery_fee - request.driver_commission).toFixed(2)} PLN
+                                            </p>
+                                            <p className="text-xs text-gray-500">
+                                                ({request.delivery_fee.toFixed(2)} - {request.driver_commission.toFixed(2)})
                                             </p>
                                         </div>
                                     </div>
